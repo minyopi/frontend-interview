@@ -20,10 +20,10 @@
 
 ### `URL` vs `URI`의 차이?
 
--> URI는 URL의 의미를 품고있다. <b>URL(Uniform Resource Locator)은 자원이 실제로 존재하는 위치</b>를 가리키며,URL은 흔히 웹 주소라고도 하며, 컴퓨터 네트워크 상에서 리소스가 어디 있는지 알려주기 위한 규약이다. URI의 서브셋이다. <b>URI(Uniform Resource Identifier)는 자원의 위치뿐만 아니라 자원에 대한 고유 식별자로서 URL을 의미를 포함</b>한다. URI는 특정 리소스를 식별하는 통합 자원 식별자(Uniform Resource Identifier)를 의미한다. 웹 기술에서 사용하는 논리적 또는 물리적 리소스를 식별하는 고유한 문자열 시퀀스다.
+-> URI는 URL의 의미를 품고있다. <b>URL(Uniform Resource Locator)은 자원이 실제로 존재하는 위치</b>를 가리키며,URL은 흔히 웹 주소라고도 하며, 컴퓨터 네트워크 상에서 리소스가 어디 있는지 알려주기 위한 규약이다. URI의 서브셋이다. <b>URI(Uniform Resource Identifier)는 자원의 위치뿐만 아니라 자원에 대한 고유 식별자로서 URL을 의미를 포함</b>한다. URI는 특정 리소스를 식별하는 통합 자원 식별자(Uniform Resource Identifier)를 의미한다. 웹 기술에서 사용하는 논리적 또는 물리적 리소스를 식별하는 고유한 문자열 시퀀스다.<br/>
 <u>URI는 식별하고, URL은 위치를 가르킨다.</u>
 <br/>
-<img src="https://www.charlezz.com/wordpress/wp-content/uploads/2021/02/www.charlezz.com-uri-url-uri-url-768x768.png">
+<img src="https://www.charlezz.com/wordpress/wp-content/uploads/2021/02/www.charlezz.com-uri-url-uri-url-768x768.png" width="300px">
 
 Path Variable 방식과 Query Parameter 방식이 있다.
 
