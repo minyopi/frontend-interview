@@ -12,11 +12,15 @@
 
 [레퍼런스: 타입스크립트, 써야할까?](https://hyunseob.github.io/2018/08/12/do-you-need-to-use-ts/)
 
+---
+
 ### 자바스크립트 테스팅
 
 ### `Event Loop`가 무엇이지?
 
 ### 프레임워크와 라이브러리의 차이?
+
+---
 
 ### `URL` vs `URI`의 차이?
 
@@ -44,6 +48,8 @@ Query Parameter 방식은 다음과 같다. 이는 자원들을 필터링해서 
 
 [URI랑 URL 차이점이 뭔데?](https://www.charlezz.com/?p=44767)
 [URL과 URI의 차이점](https://velog.io/@torang/URL%EA%B3%BC-URI%EC%9D%98-%EC%B0%A8%EC%9D%B4%EC%A0%90)
+
+---
 
 ### `API`와 `Endpoint`의 차이?
 
