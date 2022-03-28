@@ -44,3 +44,38 @@ Query Parameter 방식은 다음과 같다. 이는 자원들을 필터링해서 
 
 [URI랑 URL 차이점이 뭔데?](https://www.charlezz.com/?p=44767)
 [URL과 URI의 차이점](https://velog.io/@torang/URL%EA%B3%BC-URI%EC%9D%98-%EC%B0%A8%EC%9D%B4%EC%A0%90)
+
+### `API`와 `Endpoint`의 차이?
+
+#### API란?
+
+= API는 프로그램 혹은 시스템 간의 통신하는 창구, 즉 프로그램들이 서로 상호작용하는 것을 도와주는 매개체라 할 수 있다.
+
+1. <b>API는 서버와 데이터베이스에 대한 출입구 역할을 한다.</b>
+
+   - 데이터베이스에는 소중한 정보들이 저장된다. 그렇기에 모든 사람들이 이 데이터베이스에 접근할 수 있어서는 안된다. API는 이를 방지하기 위해 사람들이 가진 서버와 데이터베이스에 대한 출입구 역할을 하며, 허용된 사람들에게만 접근성을 부여해준다.
+
+2. <b>API는 애플리케이션과 기기가 원활하게 통신할 수 있도록 한다.</b>
+
+   - 여기서 애플리케이션이란 우리가 흔히 알고 있는 스마트폰 어플이나 프로그램을 말한다.
+     API는 애플리케이션과 기기가 데이터를 원활히 주고받을 수 있도록 돕는 역할을 한다.
+
+3. <b>API는 모든 접속을 표준화한다.</b>
+   - API는 모든 접속을 표준화하기 때문에 기계/ 운영체제 등과 상관없이 누구나 동일한 액세스를 얻을 수 있다. 쉽게 말해, API는 범용 플러그처럼 작동한다고 볼 수 있겠다.
+
+#### Endpoint?
+
+= 엔드포인트는 서비스를 사용가능하도록 하는 서비스에서 제공하는 커뮤니케이션 채널의 한쪽 끝.
+즉 요청을 받아 응답을 제공하는 서비스를 사용할 수 있는 지점을 의미 한다.
+
+예를 들어 지하철 최단 거리 경로를 제공하는 웹 서비스가 있다고 하자.
+이 서비스를 이용하는 사용자는 출발역과 도착역을 설정하고 최단 경로를 찾는 버튼을 누른다.
+이 때 최단 거리 경로를 구하는 서비스를 이용하기 위한 요청이 향하는 URI가, 엔드포인트이다.
+이 웹 서비스는 유효한 형태로 엔드포인트에 요청이 전달되었을 경우 사용자가 알 필요 없는 서비스 내부 로직을 실행하고 응답을 반환한다.
+
+#### API vs Endpoint?
+
+결국 API가 두 시스템(어플리케이션)이 상호작용(소통) 할 수 있게 하는 프로토콜의 총 집합이라면, ENDPOINT는 API가 서버에서 리소스에 접근할 수 있도록 가능하게 하는 URL이라 할 수 있겠다.
+<img src="https://postfiles.pstatic.net/MjAyMTA2MTdfMjAy/MDAxNjIzODk4ODYyNTg3.XOuG3T6VKIDbgmnvcdHhArnhPLprsWFKn-KwxGi0AvUg.8qSDRytl2qg-YnYmBCGiPtXFi7Y2myY7A4bP2YCILbgg.PNG.ghdalswl77/image.png?type=w773">
+
+[출처: API 와 Endpoint ?](https://blog.naver.com/PostView.naver?blogId=ghdalswl77&logNo=222401162545&parentCategoryNo=&categoryNo=90&viewDate=&isShowPopularPosts=true&from=search)
