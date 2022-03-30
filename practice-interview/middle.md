@@ -81,7 +81,7 @@ Query Parameter 방식은 다음과 같다. 이는 자원들을 필터링해서 
 
 #### API vs Endpoint?
 
-결국 API가 두 시스템(어플리케이션)이 상호작용(소통) 할 수 있게 하는 프로토콜의 총 집합이라면, ENDPOINT는 API가 서버에서 리소스에 접근할 수 있도록 가능하게 하는 URL이라 할 수 있겠다.
+결국 API가 두 시스템(어플리케이션)이 상호작용(소통) 할 수 있게 하는 프로토콜의 총 집합이라면, ENDPOINT는 API가 서버에서 리소스에 접근할 수 있도록 가능하게 하는 URL이라 할 수 있겠다. <br/>
 <img src="https://postfiles.pstatic.net/MjAyMTA2MTdfMjAy/MDAxNjIzODk4ODYyNTg3.XOuG3T6VKIDbgmnvcdHhArnhPLprsWFKn-KwxGi0AvUg.8qSDRytl2qg-YnYmBCGiPtXFi7Y2myY7A4bP2YCILbgg.PNG.ghdalswl77/image.png?type=w773">
 
 [출처: API 와 Endpoint ?](https://blog.naver.com/PostView.naver?blogId=ghdalswl77&logNo=222401162545&parentCategoryNo=&categoryNo=90&viewDate=&isShowPopularPosts=true&from=search)
