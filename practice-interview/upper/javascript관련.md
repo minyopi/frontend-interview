@@ -99,9 +99,116 @@ var test2 = function test2() {
 
 ---
 
+# 비동기 처리란?
+
+-> 자바스크립트의 비동기 처리란 특정 코드의 연산이 끝날 때까지 코드의 실행을 멈추지 않고 다음 코드를 먼저 실행하는 자바스크립트의 특성을 의미합니다.
+이렇게 특정 로직의 실행이 끝날 때까지 기다려주지 않고 나머지 코드를 먼저 실행하는 것이 비동기 처리입니다. 자바스크립트에서 비동기 처리가 필요한 이유를 생각해보면, 화면에서 서버로 데이터를 요청했을 때 서버가 언제 그 요청에 대한 응답을 줄지도 모르는데 마냥 다른 코드를 실행 안 하고 기다릴 순 없기 때문입니다.
+
+##비동기 처리 방식의 문제점 해결하기
+-> 콜백(callback) 함수를 이용하는 것. 특정 로직이 끝났을 때 원하는 동작을 실행시킬 수 있도록 할 수 있다.
+
+# 콜백 지옥
+
+-> 콜백 지옥은 비동기 처리 로직을 위해 콜백 함수를 연속해서 사용할 때 발생하는 문제입니다. 웹 서비스를 개발하다 보면 서버에서 데이터를 받아와 화면에 표시하기까지 인코딩, 사용자 인증 등을 처리해야 하는 경우가 있습니다. 만약 이 모든 과정을 비동기로 처리해야 한다고 하면 위와 같이 콜백 안에 콜백을 계속 무는 형식으로 코딩을 하게 됩니다. 이러한 코드 구조는 가독성도 떨어지고 로직을 변경하기도 어렵습니다. 이와 같은 코드 구조를 콜백 지옥이라고 합니다.
+
+# 콜백 지옥을 해결하는 방법
+
+-> 일반적으로 콜백 지옥을 해결하는 방법에는 Promise나 Async를 사용하는 방법이 있습니다. 만약 코딩 패턴으로만 콜백 지옥을 해결하려면 각 콜백 함수를 분리해주면 됩니다.
+
+[출처: 자바스크립트 비동기 처리와 콜백 함수](https://joshua1988.github.io/web-development/javascript/javascript-asynchronous-operation/)
+
 # Promise 란?
 
-->
+-> 프로미스는 자바스크립트 비동기 처리에 사용되는 객체입니다.
+
+### 예시로 알아보기
+
+```js
+function getData(callbackFunc) {
+  $.get("url 주소/products/1", function (response) {
+    callbackFunc(response); // 서버에서 받은 데이터 response를 callbackFunc() 함수에 넘겨줌
+  });
+}
+
+getData(function (tableData) {
+  console.log(tableData); // $.get()의 response 값이 tableData에 전달됨
+});
+```
+
+위에 코드는 콜백 함수를 활용한 것
+아래에 코드는 Promise를 적용한 것
+
+```js
+function getData(callback) {
+  // new Promise() 추가
+  return new Promise(function (resolve, reject) {
+    $.get("url 주소/products/1", function (response) {
+      // 데이터를 받으면 resolve() 호출
+      resolve(response);
+    });
+  });
+}
+
+// getData()의 실행이 끝나면 호출되는 then()
+getData().then(function (tableData) {
+  // resolve()의 결과 값이 여기로 전달됨
+  console.log(tableData); // $.get()의 reponse 값이 tableData에 전달됨
+});
+```
+
+## 프로미스의 3가지 상태
+
+프로미스를 사용할 때 알아야 하는 가장 기본적인 개념이 바로 프로미스의 상태(states)입니다. 여기서 말하는 상태란 프로미스의 처리 과정을 의미합니다. new Promise()로 프로미스를 생성하고 종료될 때까지 3가지 상태를 갖습니다.
+
+<b>Pending(대기)</b> : 비동기 처리 로직이 아직 완료되지 않은 상태
+<b>Fulfilled(이행)</b> : 비동기 처리가 완료되어 프로미스가 결과 값을 반환해준 상태
+<b>Rejected(실패)</b> : 비동기 처리가 실패하거나 오류가 발생한 상태
+
+### 프로미스 코드 예제
+
+```js
+function getData() {
+  return new Promise(function (resolve, reject) {
+    $.get("url 주소/products/1", function (response) {
+      if (response) {
+        resolve(response);
+      }
+      reject(new Error("Request is failed"));
+    });
+  });
+}
+
+// 위 $.get() 호출 결과에 따라 'response' 또는 'Error' 출력
+getData()
+  .then(function (data) {
+    console.log(data); // response 값 출력
+  })
+  .catch(function (err) {
+    console.error(err); // Error 출력
+  });
+```
+
+[출처: 자바스크립트 Promise 쉽게 이해하기](https://joshua1988.github.io/web-development/javascript/promise-for-beginners/)
+
+# async & await란?
+
+async와 await는 자바스크립트의 비동기 처리 패턴 중 가장 최근에 나온 문법입니다. 기존의 비동기 처리 방식인 콜백 함수와 프로미스의 단점을 보완하고 개발자가 읽기 좋은 코드를 작성할 수 있게 도와준다.
+
+### 기본 문법
+
+```js
+async function 함수명() {
+  await 비동기_처리_메서드_명();
+}
+```
+
+먼저 함수의 앞에 <b>async 라는 예약어</b>를 붙입니다. 그러고 나서 함수의 내부 로직 중 HTTP 통신을 하는 <b>비동기 처리 코드 앞에 await를 붙입니다.</b> 여기서 주의하셔야 할 점은 <b>비동기 처리 메서드가 꼭 프로미스 객체를 반환해야 await가 의도한 대로 동작</b>합니다.
+
+## async & await 예외 처리
+
+async & await에서 예외를 처리하는 방법은 바로 try catch입니다. 프로미스에서 에러 처리를 위해 .catch()를 사용했던 것처럼 async에서는 catch {} 를 사용하시면 됩니다.
+
+[출처: 자바스크립트 async와 await](https://joshua1988.github.io/web-development/javascript/js-async-await/)
 
 ---
 
