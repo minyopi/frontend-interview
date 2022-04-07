@@ -231,6 +231,8 @@ Ajax를 사용하면 새로운 HTML을 서버로부터 받아야하는 것이 �
 
 이를 위해 <b>캡슐화(Encapsulation), 정보은닉(Information Hiding), 추상화(Abstraction), 상속성(Inheritance)</b> 등의 특징들을 가지고 있다.
 
+일반적으로 JavaScript에서 객체지향 프로그래밍을 말한다면 Prototype을 통해 객체를 다루는 것을 말한다.
+
 ## 함수형 프로그래밍?
 
 <b>함수형 프로그래밍</b>은 <b>순수 함수(pure function)를 조합하고 공유 상태(shared state), 변경 가능한 데이터(mutable data) 및 부작용(side-effects)을 피하여 프로그래밍하는 패러다임</b>이다.
