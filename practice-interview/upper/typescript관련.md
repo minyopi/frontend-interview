@@ -1,6 +1,15 @@
 <목차>
 
 - [typescript란?](#typescript란)
+- [typescript 공식 문서 내용](#typescript-공식-문서-내용)
+  - [Union Type](#union-type)
+  - [Type Aliases](#type-aliases)
+  - [Interface](#interface)
+  - [Type Assertions](#type-assertions)
+  - [Literal Type](#literal-type)
+  - [null과 undefined](#null-과-undefined)
+- [Typescript 관련 예상 면접 질문](#typescript-관련-예상-면접-질문)
+  - [alias와 interface의 차이?](#alias와-interface의-차이는)
 
 ## `typescript`란?
 
@@ -12,9 +21,174 @@
 
 [레퍼런스: 타입스크립트, 써야할까?](https://hyunseob.github.io/2018/08/12/do-you-need-to-use-ts/)
 
+---
+
 ## `typescript` 공식 문서 내용
 
-## `alias`와 `interface`의 차이는?
+### Union Type
+
+= 유니언 타입은,서로 다른 두 개 이상의 타입들을 사용하여 만드는 것으로, 유니언 타입의 값은 타입 조합에 사용된 타입 중 **무엇이든 하나**를 타입으로 가질 수 있습니다. 조합에 사용된 각 타입을 유니언 타입의 **멤버**라고 부릅니다.
+
+```ts
+function checkId(id: number | string) {
+  //
+}
+```
+
+### Type Aliases
+
+= 똑같은 타입을 재사용하거나 또 다른 이름으로 부르고 싶은 경우 사용한다. `type alias`를 사용하면 모든 타입에 대하여 새로운 이름을 부여할 수 있다. 단, 단지 이름에 지나지 않는다는 점에 유의해야한다.
+
+```ts
+type id = {
+  x: number;
+  y: number;
+};
+```
+
+### Interface
+
+= 인터페이스는 객체 타입을 만드는 또 다른 방법이다. `alias`와 마찬가지로 마치 타입이 없는 익명 객체를 사용하는 것 처럼 동작한다. Typescript는 오직 `printCoord`에 전달된 값의 **구조**에만 관심을 가진다. 즉, 예측된 프로퍼티를 가졌는지 여부만 따진다. 이처럼, 타입이 가지는 구조와 능력에만 관심을 가진다는 점은 Typescript가 **구조적** 타입 시스템이라고 불리는 이유이다.
+
+```ts
+interface Point {
+  x: number;
+  y: number;
+}
+
+function printCoord(pt: Point) {
+  console.log("The coordinate's x value is " + pt.x);
+  console.log("The coordinate's y value is " + pt.y);
+}
+
+printCoord({ x: 100, y: 100 });
+```
+
+#### `alias` vs `interface`
+
+-> 타입 별칭과 인터페이스는 매우 유사하며, 대부분의 경우 둘 중 하나를 자유롭게 선택하여 사용할 수 있습니다. interface가 가지는 대부분의 기능은 type에서도 동일하게 사용 가능합니다. 이 둘의 가장 핵심적인 차이는, **타입은 새 프로퍼티를 추가하도록 개방될 수 없는 반면, 인터페이스의 경우 항상 확장될 수 있다는 점**입니다. 타입은 생성된 뒤에는 달라질 수 없다.
+
+### Type Assertions
+
+때로는 TypeScript보다 당신이 어떤 값의 타입에 대한 정보를 더 잘 아는 경우도 존재합니다. 이런경우 `Type Assertion`(=타입 단언)을 사용해서 좀 더 구체적으로 명시할 수 있다.
+
+```ts
+const myCanvas = document.getElementById("main_canvas") as HTMLCanvasElement;
+```
+
+이 규칙이 때로는 지나치게 보수적으로 작용하여, 복잡하기는 하지만 유효할 수 있는 강제 변환이 허용되지 않기도 합니다. 이런 경우, 두 번의 단언을 사용할 수 있습니다. any(또는 이후에 소개할 unknown)로 우선 변환한 뒤, 그다음 원하는 타입으로 변환하면 됩니다.
+
+```ts
+declare const expr: any;
+type T = { a: 1; b: 2; c: 3 };
+// ---중간 생략---
+const a = expr as any as T;
+```
+
+### Literal Type
+
+= string과 number와 같은 일반적인 타입 이외에도, 구체적인 문자열과 숫자 값을 타입 위치에서 지정할 수 있습니다.
+= 리터럴을 유니언과 함께 사용하면, 보다 유용한 개념들을 표현할 수 있게 됩니다. 예를 들어, 특정 종류의 값들만을 인자로 받을 수 있는 함수를 정의하는 경우가 있습니다.
+
+```ts
+// ex) string ver.
+function printText(s: string, alignment: "left" | "right" | "center") {
+  // ...
+}
+printText("Hello, world", "left");
+printText("G'day, mate", "centre"); // error
+
+// ex) number ver.
+function compare(a: string, b: string): -1 | 0 | 1 {
+  return a === b ? 0 : a > b ? 1 : -1;
+}
+```
+
+#### Literal Inference (리터럴 추론)
+
+객체를 사용하여 변수를 초기화하면, TypeScript는 해당 객체의 프로퍼티는 이후에 그 값이 변화할 수 있다고 가정합니다. 예를 들어, 아래와 같은 코드를 작성하는 경우를 보겠습니다.
+
+```ts
+declare const someCondition: boolean;
+// ---중간 생략---
+const obj = { counter: 0 };
+if (someCondition) {
+  obj.counter = 1;
+}
+```
+
+동일한 사항이 문자열에도 적용됩니다.
+
+```ts
+const req = { url: "https://example.com", method: "GET" };
+handleRequest(req.url, req.method); // Argument of type 'string' is not assignable to parameter of type '"GET" | "POST"'.
+```
+
+위 예시에서 req.method는 string으로 추론되지, "GET"으로 추론되지 않습니다. req의 생성 시점과 handleRequest의 호출 시점 사이에도 얼마든지 코드 평가가 발생할 수 있고, 이때 req.method에 "GUESS"와 같은 새로운 문자열이 대입될 수도 있으므로, TypeScript는 위 코드에 오류가 있다고 판단합니다.
+해결방법은 두가지가 있다.
+
+1. 둘 중에 한 위치에 타입 단언을 추가하여 추론 방식을 변경할 수 있습니다.
+
+```ts
+// 수정 1:
+const req = { url: "https://example.com", method: "GET" as "GET" };
+// 수정 2
+handleRequest(req.url, req.method as "GET");
+```
+
+2. `as const`를 사용하여 객체 전체를 리터럴 타입으로 변환할 수 있습니다.
+
+```ts
+declare function handleRequest(url: string, method: "GET" | "POST"): void;
+// ---중간 생략---
+const req = { url: "https://example.com", method: "GET" } as const;
+handleRequest(req.url, req.method);
+```
+
+`as const` 접미사는 일반적인 `const`와 유사하게 작동하는데, 해당 객체의 모든 프로퍼티에 `string` 또는 `number`와 같은 보다 일반적인 타입이 아닌 리터럴 타입의 값이 대입되도록 보장합니다.
+
+### null 과 undefined
+
+JavaScript에는 빈 값 또는 초기화되지 않은 값을 가리키는 두 가지 원시값이 존재합니다. 바로 `null`과 `undefined`입니다.
+
+TypeScript에는 각 값에 대응하는 동일한 이름의 두 가지 *타입*이 존재합니다. 각 타입의 동작 방식은 `strictNullChecks` 옵션의 설정 여부에 따라 달라집니다.
+
+#### `strictNullChecks`가 설정되지 않았을 때
+
+`strictNullChecks`가 설정되지 않았다면, 어떤 값이 `null` 또는 `undefined`일 수 있더라도 해당 값에 평소와 같이 접근할 수 있으며, `null`과 `undefined`는 모든 타입의 변수에 대입될 수 있습니다. 이는 Null 검사를 하지 않는 언어(C#, Java 등)의 동작 방식과 유사합니다. Null 검사의 부재는 버그의 주요 원인이 되기도 합니다. 별다른 이유가 없다면, 코드 전반에 걸쳐 `strictNullChecks` 옵션을 설정하는 것을 항상 권장합니다.
+
+#### `strictNullChecks` 설정되었을 때
+
+`strictNullChecks`가 설정되었다면, 어떤 값이 `null` 또는 `undefined`일 때, 해당 값과 함께 메서드 또는 프로퍼티를 사용하기에 앞서 해당 값을 테스트해야 합니다. 옵셔널 프로퍼티를 사용하기에 앞서 `undefined` 여부를 검사하는 것과 마찬가지로, *좁히기*를 통하여 `null`일 수 있는 값에 대한 검사를 수행할 수 있습니다.
+
+```ts
+function doSomething(x: string | undefined) {
+  if (x === undefined) {
+    // 아무 것도 하지 않는다
+  } else {
+    console.log("Hello, " + x.toUpperCase());
+  }
+}
+```
+
+#### Null 아님 단언 연산자 (접미사!)
+
+TypeScript에서는 명시적인 검사를 하지 않고도 타입에서 `null`과 `undefined`를 제거할 수 있는 특별한 구문을 제공합니다. 표현식 뒤에 !를 작성하면 해당 값이 null 또는 undefined가 아니라고 타입 단언하는 것입니다.
+
+```ts
+function liveDangerously(x?: number | undefined) {
+  // 오류 없음
+  console.log(x!.toFixed());
+}
+```
+
+다른 타입 단언과 마찬가지로 이 구문은 코드의 런타임 동작을 변화시키지 않으므로, ! 연산자는 반드시 해당 값이 `null` 또는 `undefined`가 아닌 경우에만 사용해야 합니다.
+
+---
+
+## Typescript 관련 예상 면접 질문
+
+### `alias`와 `interface`의 차이는?
 
 - `alias`는 `extends` 또는 `implements` 될 수 없다. 하지만 `interface`로 표현할 수 없거나 유니온 또는 튜플을 사용해야 한다면 타입 `alias`를 사용하는게 유리하다.
 - `interface`는 `extends`또는 `implements`될 수 있다. 상속을 통해 확장이 필요하다면 타입 `alias`보다는 `interface`가 유리하다.
