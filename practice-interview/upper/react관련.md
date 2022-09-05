@@ -9,6 +9,7 @@
 - [props drilling에 대해서](#prop-drilling은-무엇이고-어떻게-피할-수-있나요)
 - [제어 컴포넌트 vs 비제어 컴포넌트](#제어-컴포넌트와-비제어-컴포넌트의-차이는-무엇인가요)
 - [서버사이드렌더링 이란?](#서버-사이드-렌더링이란--spa와-서버-사이드-렌더링의-차이는)
+- [SSR과 SSG의 차이?](#ssr과-ssg의-차이는)
 
 # javascript의 프레임워크로 React의 장점? (사용하는 이유)
 
@@ -123,6 +124,42 @@ export default function App() {
 - 빠른 속도와 서버 부하 감소
 - 사용자 친화적
 
-## Next.JS
+## SSR과 SSG의 차이는?
+
+## Next.js
+
+= Next js는 간단하게 SPA에 SSR을 사용할 수 있도록 하는 프레임워크다.
+
+NEXT는 브라우저에 렌더링 할 때 기본적으로 pre-redering(사전 렌더링)을 한다고 소개한다(이는 NEXT의 default로 설정되어 있다). pre-rendering이란 각 페이지들을 사전에 미리 HTML 문서로 생성하여 가지고 있는 것이다. 즉 Pure React에서 CSR 방식은 번들링 된 js가 클라이언트 단에서 모든 추가 렌더링을 담당했다면 Next의 pre-rendering 시스템에서는 빌드 타임 때 해당하는 페이지 별로 각각의 HTML 문서를 미리 생성해 가지고 있다가 서버로 요청이 들어올 때 알맞은 페이지를 반환해준다.
+
+![](https://velog.velcdn.com/images/longroadhome/post/183a4341-072f-4208-a898-20aaf7a60d6a/312312.png)
+![](https://velog.velcdn.com/images/longroadhome/post/5cd7fc0d-63b3-47cc-97b8-e6c85894add4/123123.png)
+
+Next에서 pre-rendering을 하기 위해 두 가지 형식이 있다. 두 방식은 Next에서 pre-rendering을 어떻게 그리고 언제 제공하는지에 대한 차이이다.
+
+- Static-Generation (추천) : **HTML을 빌드 타임에 각 페이지별로 생성하고 해당 페이지로 요청이 올 경우 이미 생성된 HTML 문서를 반환**한다.
+- Server-Side-Rendering : **요청이 올 때 마다 해당하는 HTML 문서를 그때 그때 생성하여 반환**한다.
+
+Next 공식문서에서는 만약 데이터의 변동이 매우 빈번하게 일어난다면 굳이 (데이터에 대한) pre-rendering을 취하지 말고 기존 pure react에서 처럼 data-fetching을 통해 클라이언트 사이드에서 렌더링 할 것을 권고하고 있다(물론 첫 페이지 일부는 Static Generation일 것이다. 아무 설정하지 않는다면 Static Generation이 default 값 이므로). 공식문서에서는 유저 대시보드에 이러한 전략을 취할 것을 권고한다. 유저 대시보드는 일단 개인적인 영역이면서 특정 유저에게 귀속되며 외부 노출이 필요하거나 SEO를 적용해야할 필요가 거의 없다. 또한 유저의 수정을 통해 즉각적으로 출력되는 화면이 변동하기에 유저 대시보드와 같은 경우 CSR 방식으로 운용하는 것이 좋은 접근 방법이 될 수 있다. 즉 정리하자면 Next 라는 프레임워크에서는 SSR 지원 방식을 두 가지로 나누어 SSR + SSG 로 세분화 한 전략을 취하고 있다고 생각하면 좋을 것 같다.
+
+### SSG(Static Site Generation)
+
+![](https://velog.velcdn.com/images/longroadhome/post/2b082fb2-ca4f-487d-a3d7-d6211e2c14f3/fsfsdbsdfse.png)
+Static-Generation(또는 SSG) 방식은 빌드 타임(npm run build 시) 우리가 pages 폴더에서 작성한 각 페이지들에 대한 각각의 HTML 문서를 생성해서 static 문서로 가지고 있게 된다. 이 페이지에 대한 유저들의 요청이 발생하게 되면, 요청에 따라 계속 서버에서 재생성 하는 것이 아니라 이미 생성이 완료된 페이지를 반환해주게 된다. 따라서 생성이 완료된 HTML 문서를 재활용 하기에 응답 속도가 매우 빠르다. Next에서는 다음과 같은 경우에 Static-Generation 을 사용할 것을 권고하고 있다.
+
+퍼포먼스에 집중 (CDN을 통해 더 빠른 응답 가능)
+마케팅 페이지 / 블로그 게시물 / 제품의 목록 등과 같이 정적 생성하여 각 요청에 동일한 문서를 반환할 수 있는 경우
+
+### SSR (Server Side Rendering)
+
+![](https://velog.velcdn.com/images/longroadhome/post/9137471c-0491-41c2-bd59-f9d1cd0a2811/adfasdf.png)
+SSR 방식은 유저의 요청 때 마다 그에 상응하는 HTML 문서를 생성하여 반환하는 방식이다. 즉 이전 포스팅에서 계속 설명해오던 바로 그 방식을 말한다. SSR을 사용하는 경우는 다음과 같이 설명하고 있다.
+
+항상 최신 상태를 유지해야 하는 경우 (요청에 따라 응답해야 할 내용이 시시각각 변함)
+제품의 상세 페이지 / 분석 차트 등 요청 마다 다른 내용 또는 형식의 HTML 문서가 반환되는 경우
+
+[출처: [FE] SSR(Server-Side-Rendering) 그리고 SSG(Static-Site-Generation) (feat. NEXT를 중심으로)](https://velog.io/@longroadhome/FE-SSRServer-Side-Rendering-%EA%B7%B8%EB%A6%AC%EA%B3%A0-SSGStatic-Site-Generation-feat.-NEXT%EB%A5%BC-%EC%A4%91%EC%8B%AC%EC%9C%BC%EB%A1%9C#1-cra)
+
+---
 
 [출처: React 인터뷰 대비 질문과 답변 15](https://velog.io/@dojunggeun/React-interview-questions-15)
