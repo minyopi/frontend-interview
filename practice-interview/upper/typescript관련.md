@@ -1,7 +1,7 @@
 <목차>
 
-- [typescript란?](#typescript란)
-- [typescript 공식 문서 내용](#typescript-공식-문서-내용)
+- [Typescript란?](#typescript란)
+- [Typescript 공식 문서 내용](#typescript-공식-문서-내용)
   - [Union Type](#union-type)
   - [Type Aliases](#type-aliases)
   - [Interface](#interface)
@@ -12,7 +12,7 @@
 - [Typescript 관련 예상 면접 질문](#typescript-관련-예상-면접-질문)
   - [alias와 interface의 차이?](#alias와-interface의-차이는)
 
-## `typescript`란?
+## `Typescript`란?
 
 -> 타입스크립트는 자바스크립트의 슈퍼셋인 오픈소스 프로그래밍 언어이다.
 
@@ -24,7 +24,7 @@
 
 ---
 
-## `typescript` 공식 문서 내용
+## `Typescript` 공식 문서 내용
 
 ### Union Type
 
@@ -188,6 +188,7 @@ function liveDangerously(x?: number | undefined) {
 ### Generics
 
 단일 타입이 아닌 다양한 타입에서 작동하는 컴포넌트를 작성할 수 있습니다. 사용자는 제네릭을 통해 여러 타입의 컴포넌트나 자신만의 타입을 사용할 수 있습니다.
+
 ( =>Generic은 자료형을 정하지 않고 여러 타입을 사용할 수 있게 해준다. 즉, 선언 시점이 아니라 생성 시점에 타입을 명시하여 하나의 타입만이 아닌 다양한 타입을 사용할 수 있도록 한다. 한번의 선언으로 다양한 타입에 '재사용'이 가능하다는 장점이 있다. )
 
 제네릭을 쓰지 않을 경우, 불필요한 타입 변환을 하기 때문에 프로그램의 성능에 악영향을 미치기도 하는데, 제네릭을 사용하게되면 따로 타입 변환을 할 필요가 없어서 프로그램의 성능이 향상되는 장점이 있다.
@@ -208,6 +209,53 @@ let output = identity("myString"); // 출력 타입은 'string'입니다.
 ```
 
 타입 인수를 꺾쇠괄호(<>)에 담아 명시적으로 전달해 주지 않은 것을 주목하세요; 컴파일러는 값인 "myString"를 보고 그것의 타입으로 Type를 정합니다. 인수 추론은 코드를 간결하고 가독성 있게 하는 데 있어 유용하지만 더 복잡한 예제에서 컴파일러가 타입을 유추할 수 없는 경우엔 명시적인 타입 인수 전달이 필요할 수도 있습니다.
+
+```ts
+// ex)
+// number 타입의 매개변수를 return하는 함수
+function NumberReturnFunc(arg: number): number {
+  return arg;
+}
+
+// string 타입의 매개변수를 return하는 함수
+function StringReturnFunc(arg: string): string {
+  return arg;
+}
+
+// boolean 타입의 매개변수를 return하는 함수
+function BooleanReturnFunc(arg: boolean): boolean {
+  return arg;
+}
+
+// 이런 경우에  한개의 제네릭 타입을 사용하여 함수를 구현할 수 있다.
+function GenericReturnFunc<T>(arg: T): T {
+  return arg;
+}
+
+// 호출시에는 이런식으로 지정해서 사용할 수 있게 된다.
+let numVar = GenericReturnFunc<number>(123);
+let strVar = GenericReturnFunc<string>("ABC");
+
+// 만약 이렇게 쓰게되면 <>를 사용하지 않고, 인수의 타입인 'string'으로 자동으로 결정
+let strVar = GenericReturnFunc("ABC");
+```
+
+#### 제네릭 화살표 함수 (Generic Arrow Fuction)
+
+```ts
+// tsx 확장자 파일에서는 에러를 발생시킨다. 태그로 해석해버린다.
+let GenericReturnFunc = <Type>(arg: Type): Type => {
+  return arg;
+};
+
+// tsx 확장자에서 제네릭 화살표 함수를 구현해야 하는 경우
+// 제네릭 매개변수에 extends를 사용하여 컴파일러에게 제네릭 화살표 함수라고 알려줘야 한다.
+let GenericReturnFunc = <Type extends {}>(arg: Type): Type => {
+  return arg;
+};
+```
+
+[출처: 평범한 직장인의 공부 정리](https://developer-talk.tistory.com/195)
 
 ---
 
