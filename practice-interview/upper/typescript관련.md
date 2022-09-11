@@ -9,6 +9,7 @@
   - [Literal Type](#literal-type)
   - [null과 undefined](#null-과-undefined)
   - [Generics](#generics)
+  - [Narrowing](#Narrowing)
 - [Typescript 관련 예상 면접 질문](#typescript-관련-예상-면접-질문)
   - [alias와 interface의 차이?](#alias와-interface의-차이는)
 
@@ -256,6 +257,111 @@ let GenericReturnFunc = <Type extends {}>(arg: Type): Type => {
 ```
 
 [출처: 평범한 직장인의 공부 정리](https://developer-talk.tistory.com/195)
+
+### Narrowing
+
+= 덜 정확한 타입에서 더 정확한 타입으로 변할 수 있다. 이 과정을 **type narrowing**이라고 한다. 타입 에러를 피하기 위해 type narrowing을 사용할 수 있다.
+
+#### 1. `typeof` type guards
+
+자바스크립트에서는 `typeof` operator를 지원한다. 종류는 아래와 같다.
+
+- "string"
+- "number"
+- "bigint"
+- "boolean"
+- "symbol"
+- "undefined"
+- "object"
+- "function"
+
+`typeof` 연산자를 활용하여 아래와 같이 조건문으로 에러를 방지할 수 있다.
+
+```ts
+function padLeft(padding: number | string, input: string) {
+  if (typeof padding === "number") {
+    return " ".repeat(padding) + input;
+  }
+  return padding + input;
+}
+```
+
+그러나, 아래와 같은 에러를 마주할 수 있다. `array`타입과 `null`모두 `object`타입으로 자바스크립에서는 인지하기 때문이다. 그럴때는 “truthiness” checking를 하는게 좋다.
+
+```ts
+function printAll(strs: string | string[] | null) {
+  if (typeof strs === "object") {
+    for (const s of strs) {
+      // error: Object is possibly 'null'.
+      console.log(s);
+    }
+  } else if (typeof strs === "string") {
+    console.log(strs);
+  } else {
+    // do nothing
+  }
+}
+```
+
+#### 2. Truthiness narrowing
+
+위와 같은 예시에서 `null`을 걸러내기 위해서는 Truthiness 체크를 통해 걸러낼 수 있다.
+
+```ts
+// ex) strs의 truthiness를 확인
+function printAll(strs: string | string[] | null) {
+  if (strs && typeof strs === "object") {
+    // 여기에다가 strc의 trutiness를 확인하도록 한다.
+    for (const s of strs) {
+      console.log(s);
+    }
+  } else if (typeof strs === "string") {
+    // 앞에서 strs를 함께 거르면 empty string을 판단하지 못하는 경우 발생.
+    console.log(strs);
+  }
+}
+```
+
+```ts
+// ex) !를 사용하여 확인
+function multiplyAll(
+  values: number[] | undefined,
+  factor: number
+): number[] | undefined {
+  if (!values) {
+    return values;
+  } else {
+    return values.map((x) => x * factor);
+  }
+}
+```
+
+<`falsy` 한 값>
+
+- 0
+- NaN
+- "" (the empty string)
+- 0n (the bigint version of zero)
+- null
+- undefined
+
+#### 3. Equality narrowing
+
+#### 4. The in operator narrowing
+
+#### 5. `instanceof` narrowing
+
+#### 6. Assignments
+
+#### 7. Control flow analysis
+
+#### 8. Using type predicates
+
+#### 9. Discriminated unions
+
+#### 10. The never type
+
+#### 11. Exhastiveness checking
 
 ---
 
