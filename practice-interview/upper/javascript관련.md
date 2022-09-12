@@ -408,6 +408,7 @@ setTimeout에 특정 지연 시간을 지정하더라도, 큐에서 대기 중�
 이벤트 루프는 마이크로태스크 큐의 모든 태스크들을 처리한 다음, 태스크 큐의 태스크들을 처리한다. 따라서, Promise 의 콜백함수가 setTimeout() 의 콜백함수보다 먼저 처리된다.
 
 [출처: 자바스크립트와 이벤트 루프](https://meetup.toast.com/posts/89)
+[참고자료: [JavaScript] 런타임 작동 방식, 비동기와 이벤트 루프 ](https://hanamon.kr/javascript-%EB%9F%B0%ED%83%80%EC%9E%84-%EC%9E%91%EB%8F%99-%EB%B0%A9%EC%8B%9D-%EB%B9%84%EB%8F%99%EA%B8%B0%EC%99%80-%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EB%A3%A8%ED%94%84/)
 
 ---
 
