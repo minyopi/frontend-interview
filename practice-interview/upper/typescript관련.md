@@ -9,9 +9,10 @@
   - [Literal Type](#literal-type)
   - [null과 undefined](#null-과-undefined)
   - [Generics](#generics)
-  - [Narrowing](#Narrowing)
+  - [Narrowing](#narrowing)
 - [Typescript 관련 예상 면접 질문](#typescript-관련-예상-면접-질문)
   - [alias와 interface의 차이?](#alias와-interface의-차이는)
+  - [any과 unknown의 차이?](#unknown-vs-any-차이는)
 
 ## `Typescript`란?
 
@@ -261,6 +262,9 @@ let GenericReturnFunc = <Type extends {}>(arg: Type): Type => {
 ### Narrowing
 
 = 덜 정확한 타입에서 더 정확한 타입으로 변할 수 있다. 이 과정을 **type narrowing**이라고 한다. 타입 에러를 피하기 위해 type narrowing을 사용할 수 있다.
+= 컴파일과 런타임을 이해하고 안전한 앱을 만든다. type narrowing을 통해 type guard를 적극적으로 사용하면, 안전한 앱을 만들 수 있다. 타입스크립트는 컴파일 단계에서 에러를 잡는것. 런타임에는 관여하지 않는다. 런타임은 타입 가드를 통해 잡아야 한다.
+= 컴파일 단계에서 에러는 `typescript`를 통해 체크하고, 런타임 단계에서는 리액트의 경우 `prop types`를 통해 체크할 수 있다. ( 과연 둘 다 사용해야 하는가에 관해서는 정답이 없다. 만일 `prop types`를 사용하지 않을때는 `typescript`의 `type guard`를 통해 런타임 에러를 적극적으로 방지 한다. )
+= 왜냐하면, typescript의 **Soundness** 라는 특성 떄문이다. 타입스크립트는 런타임에 개입하지 않고 개발자에게 권한을 준다.
 
 #### 1. `typeof` type guards
 
@@ -371,3 +375,127 @@ function multiplyAll(
 
 - `alias`는 `extends` 또는 `implements` 될 수 없다. 하지만 `interface`로 표현할 수 없거나 유니온 또는 튜플을 사용해야 한다면 타입 `alias`를 사용하는게 유리하다.
 - `interface`는 `extends`또는 `implements`될 수 있다. 상속을 통해 확장이 필요하다면 타입 `alias`보다는 `interface`가 유리하다.
+
+---
+
+### `unknown` vs `any` 차이는?
+
+**< 등장 배경 >**
+= `any`처럼 어떤 타입의 value든 할당할 수 있으면서 실제로 사용할 때는 개발자로 하여금 타입을 체킹하도록 만들 수 있는 타입이 필요했다. 그래서 조금 덜 수용적인 `unknown` 타입을 만들게 된 것이다.
+= 사용자로부터 입력을 받거나 잘 알려지지 않은 외부 API를 사용하는 등 실제로 어떤 값이 올 지 모를 때, 어떤 값이든 할당할 수 있지만 정작 이후에 그 값을 사용할 때는 타입 체킹을 해서 안전하게 사용하게 하기 위해 쓸 수 있다.
+
+**< 차이점 >**
+
+- `any` 타입의 값은 어느 타입의 변수에도 할당될 수 있으나, `unknown` 타입의 값은 `any`와 `unknown` 타입을 제외한 타입의 변수에는 할당이 불가능하다.
+
+ex)
+
+```ts
+let notSure: unknown;
+notSure = 1;
+notSure = "maybe a string instead";
+
+// any type에는 unknown 타입 할당 가능
+let anyType: any;
+anyType = notSure;
+
+// any, unknown 이외의 type에는 unknown 타입 할당 불가능
+let numberType: number;
+numberType = notSure; // compile error!
+```
+
+- `unknown`의 경우는, `any`와 다르게 에러를 뱉을 수 있다.
+
+ex)
+
+```ts
+// any의 경우
+
+let num: any = 99;
+num.trim(); // 에러를 뱉어내지 않는다.
+
+// unknown의 경우
+let num: unknown = 99;
+num.trim(); // Object is of type 'unknown'. 라는 에러를 뱉어낸다.
+
+// unknown을 사용하며 타입가드를 사용하여 런타임 에러를 막는 경우
+let num: unknown = 99;
+
+if (typeof num === "string") {
+  num.trim();
+}
+
+(num as string).trim();
+```
+
+ex)
+
+```ts
+// any의 경우
+
+let foo: any = 10;
+
+// All of these will throw errors, but TypeScript
+// won't complain since `foo` has the type `any`.
+foo.x.prop;
+foo.y.prop;
+foo.z.prop;
+foo();
+new foo();
+upperCase(foo);
+foo`hello world!`;
+
+function upperCase(x: string) {
+  return x.toUpperCase();
+}
+```
+
+```ts
+// unknown의 경우
+
+let foo: unknown = 10;
+
+// Since `foo` has type `unknown`, TypeScript
+// errors on each of these usages.
+foo.x.prop;
+foo.y.prop;
+foo.z.prop;
+foo();
+new foo();
+upperCase(foo);
+foo`hello world!`;
+
+function upperCase(x: string) {
+  return x.toUpperCase();
+}
+```
+
+```ts
+// unknown with type guard
+
+let foo: unknown = 10;
+
+function hasXYZ(obj: any): obj is { x: any; y: any; z: any } {
+  return (
+    !!obj && typeof obj === "object" && "x" in obj && "y" in obj && "z" in obj
+  );
+}
+
+// Using a user-defined type guard...
+if (hasXYZ(foo)) {
+  // ...we're allowed to access certain properties again.
+  foo.x.prop;
+  foo.y.prop;
+  foo.z.prop;
+}
+
+// We can also just convince TypeScript we know what we're doing
+// by using a type assertion.
+upperCase(foo as string);
+
+function upperCase(x: string) {
+  return x.toUpperCase();
+}
+```
+
+[참고자료: [Typescript] unknown vs any type](https://roseline.oopy.io/dev/typescript-unknown-vs-any-type)
