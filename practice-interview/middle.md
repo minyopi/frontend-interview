@@ -1,7 +1,5 @@
 # 프론트엔드 면접 준비
 
-## 면접 중요도 (중)
-
 - [애자일 방법론](#애자일-방법론)
 - [URL vs URI](#url-vs-uri의-차이)
 - [API와 Endpoint](#api-vs-endpoint)
