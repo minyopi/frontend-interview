@@ -351,6 +351,39 @@ function multiplyAll(
 
 #### 3. Equality narrowing
 
+타입스크립트에서는 또한 `switch`문과 `===`, `!==`, `==`, `!=`을 사용하여 동일성을 체크하여 타입을 좁힐 수 있다.
+
+```ts
+function example(x: string | number, y: string | boolean) {
+  if (x === y) {
+    // We can now call any 'string' method on 'x' or 'y'.
+    x.toUpperCase();
+    y.toLowerCase();
+  } else {
+    console.log(x); // x: string | number
+    console.log(y); // y: string | boolean
+  }
+}
+```
+
+자바스크립트의 `==`, `!=`를 통한 느슨한 동등성(=looser equality)을 통해서도 올바르게 타입을 좁힐 수 있다.
+
+```ts
+interface Container {
+  value: number | null | undefined;
+}
+
+function multiplyValue(container: Container, factor: number) {
+  // Remove both 'null' and 'undefined' from the type.
+  if (container.value != null) {
+    console.log(container.value); //Container.value: number
+
+    // Now we can safely multiply 'container.value'.
+    container.value *= factor;
+  }
+}
+```
+
 #### 4. The in operator narrowing
 
 #### 5. `instanceof` narrowing
