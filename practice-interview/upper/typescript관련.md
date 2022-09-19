@@ -10,6 +10,17 @@
   - [null과 undefined](#null-과-undefined)
   - [Generics](#generics)
   - [Narrowing](#narrowing)
+    - [typeof type guards](#1-typeof-type-guards)
+    - [truthiness narrowing](#2-truthiness-narrowing)
+    - [equlity narrowing](#3-equality-narrowing)
+    - [the `in` operator narrowing](#4-the-in-operator-narrowing)
+    - [`instanceof` narrowing](#5-instanceof-narrowing)
+    - [assignments](#6-assignments)
+    - [control flow analysis](#7-control-flow-analysis)
+    - [using type predicates](#8-using-type-predicates)
+    - [discriminated unions](#9-discriminated-unions)
+    - [the never type](#10-the-never-type)
+    - [exhastiveness checking](#11-exhastiveness-checking)
 - [Typescript 관련 예상 면접 질문](#typescript-관련-예상-면접-질문)
   - [alias와 interface의 차이?](#alias와-interface의-차이는)
   - [any과 unknown의 차이?](#unknown-vs-any-차이는)
@@ -384,21 +395,225 @@ function multiplyValue(container: Container, factor: number) {
 }
 ```
 
-#### 4. The in operator narrowing
+#### 4. The `in` operator narrowing
+
+자바스크립트의 `in`연산자를 이용해서, 객체의 프로퍼티의 이름을 확인하여 타입을 좁힐 수 있다.
+
+```ts
+type Fish = { swim: () => void };
+type Bird = { fly: () => void };
+
+function move(animal: Fish | Bird) {
+  if ("swim" in animal) {
+    return animal.swim();
+  }
+
+  return animal.fly();
+}
+```
+
+같은 프로퍼티를 가지고 있는 경우는 두가지 경우 모두에 해당될 수 있다.
+
+```ts
+type Fish = { swim: () => void };
+type Bird = { fly: () => void };
+type Human = { swim?: () => void; fly?: () => void };
+
+function move(animal: Fish | Bird | Human) {
+  if ("swim" in animal) {
+    animal; // animal: Fish | Human
+  } else {
+    animal; // animal: Bird | Human
+  }
+}
+```
 
 #### 5. `instanceof` narrowing
 
-#### 6. Assignments
+자바스크립트에는 다른 값이 해당 인스턴스의 값인지 아닌지 확인해주는 `instanceof` 연산자를 통해서 타입을 좁힐 수 있다.
+(= instanceof 연산자는 생성자의 프로토타입 속성이 객체의 프로토타입 체인에 나타나는지 확인하기 위해 테스트합니다. 반환 값은 boolean 값입니다. 해당 동작은 `Symbol.hasInstance`로 사용자 정의할 수 있습니다.)
 
-#### 7. Control flow analysis
+```ts
+function logValue(x: Date | string) {
+  if (x instanceof Date) {
+    console.log(x.toUTCString()); // x: Date
+  } else {
+    console.log(x.toUpperCase()); // x: string
+  }
+}
+```
+
+#### 6. Assignments ( = 할당 )
+
+변수에 할당할 때 TypeScript는 할당의 오른쪽을 보고 왼쪽을 적절하게 좁힙니다.
+
+```ts
+let x = Math.random() < 0.5 ? 10 : "hello world!"; // x: string | number
+
+x = 1;
+console.log(x); // let x: number;
+
+x = "goodbye!";
+console.log(x); //let x: string;
+```
+
+값을 할당할 때에 처음에 선언할때 지정한 타입과 다른 값이 할당되면 에러로 알려줍니다.
+
+```ts
+let x = Math.random() < 0.5 ? 10 : "hello world!"; // let x: string | number
+
+x = 1;
+
+console.log(x); // let x: number
+
+x = true; // Error: Type 'boolean' is not assignable to type 'string | number'.
+
+console.log(x); // let x: string | number
+```
+
+#### 7. Control flow analysis ( = 제어 흐름 분석 )
+
+도달 가능성에 기반한 이러한 코드 분석을 제어 흐름 분석( = control flow analysis )이라고 합니다. 그리고, typescript는 이 흐름 분석을 사용하여 유형 가드 및 할당이 발생할 때 유형을 좁힙니다. 변수를 분석할 때 제어 흐름은 계속해서 분리되고 다시 병합될 수 있으며 해당 변수는 각 지점에서 다른 유형을 갖는 것으로 관찰될 수 있습니다.
+
+```ts
+function example() {
+  let x: string | number | boolean;
+
+  x = Math.random() < 0.5;
+
+  console.log(x); // let x: boolean
+
+  if (Math.random() < 0.5) {
+    x = "hello";
+    console.log(x); // let x: string
+  } else {
+    x = 100;
+    console.log(x); // let x: number
+  }
+
+  return x; // let x: string | number
+}
+```
 
 #### 8. Using type predicates
 
+지금까지는 자바스크립에 구성으로 타입을 좁혔지만, 코드 전체에서 유형이 변경되는 ㅂ아식을 보다 직접적으로 제어하기를 원합니다. 사용자 정의 type guard 를 정의하려면 반환 유형이 **type predicate**의 함수를 정의하면 된다.
+
+```ts
+function isFish(pet: Fish | Bird): pet is Fish {
+  return (pet as Fish).swim !== undefined;
+}
+```
+
+여기에서 `pet is Fish`가 type predicate에 해당한다. predicate는 `parameterName is Type`의 형식을 취합니다. 여기서 `parameterName`은 최근 함수의 서명에 parameter의 이름을 사용해야 합니다.
+
+```ts
+// Both calls to 'swim' and 'fly' are now okay.
+let pet = getSmallPet();
+
+if (isFish(pet)) {
+  pet.swim();
+} else {
+  pet.fly();
+}
+```
+
 #### 9. Discriminated unions
+
+지금까지는 단순한 타입을 좁히는것에 집중했지만 우리는 더욱 복잡한 것들을 다뤄야 할 때가 있다.
+
+ex) bad
+
+```ts
+interface Shape {
+  kind: "circle" | "square";
+  radius?: number;
+  sideLength?: number;
+}
+
+function getArea(shape: Shape) {
+  if (shape.kind === "circle") {
+    return Math.PI * shape.radius! ** 2;
+    // Error: Object is possibly 'undefined'. 에 대처하기 위하여 !를 사용.
+  }
+}
+```
+
+ex) good
+
+```ts
+interface Circle {
+  kind: "circle";
+  radius: number;
+}
+
+interface Square {
+  kind: "square";
+  sideLength: number;
+}
+
+type Shape = Circle | Square;
+
+function getArea(shape: Shape) {
+  switch (shape.kind) {
+    case "circle":
+      return Math.PI * shape.radius ** 2; // shape: Circle
+    case "square":
+      return shape.sideLength ** 2; // shape: Square
+  }
+}
+```
+
+제대로 된 정보로 Typescript와 소통하면 다른 방식으로 작성했을 JavaScript와 다르지 않은 안전한 유형의 TypeScript 코드를 작성할 수 있습니다. Discriminated unions를 사용하면 네트워크(클라이언트/서버 통신)를 통해 메시지를 보낼 때나 상태 관리 프레임워크에서 변형을 인코딩할 때와 같이 JavaScript에서 모든 종류의 메시징 체계를 나타내는 데 좋습니다.
 
 #### 10. The never type
 
+좁힐 때 모든 가능성을 제거하고 아무것도 남지 않은 지점까지 결합 옵션을 줄일 수 있습니다. 이러한 경우 TypeScript는 `never` 유형을 사용하여 존재해서는 안 되는 상태를 나타냅니다.
+
 #### 11. Exhastiveness checking
+
+`never`유형은 모든 유형에 할당할 수 있다. 그러나 `never`에 할당할 수 있는 유형은 없습니다. 즉, 타입 좁히기를 사용할 수 있고 `switch`문에서 철저한 검사를 수행하기 위해 절대 나타나지 않는 것에 의존할 수 있습니다.
+
+```ts
+type Shape = Circle | Square;
+
+function getArea(shape: Shape) {
+  switch (shape.kind) {
+    case "circle":
+      return Math.PI * shape.radius ** 2;
+    case "square":
+      return shape.sideLength ** 2;
+    default:
+      const _exhaustiveCheck: never = shape;
+      return _exhaustiveCheck;
+  }
+}
+```
+
+`switch`문에 default값에 never를 추가하면, 다뤄지지 않은 가능한 모든 케이스들을 발생시킨다.
+
+예를들어, 새로운 `Shape`를 추가한다고 했을때 에러를 야기시킬수 있다.
+
+```ts
+interface Triangle {
+  kind: "triangle";
+  sideLength: number;
+}
+
+type Shape = Circle | Square | Triangle;
+
+function getArea(shape: Shape) {
+  switch (shape.kind) {
+    case "circle":
+      return Math.PI * shape.radius ** 2;
+    case "square":
+      return shape.sideLength ** 2;
+    default: // Type 'Triangle' is not assignable to type 'never'.
+      const _exhaustiveCheck: never = shape;
+      return _exhaustiveCheck;
+  }
+}
+```
 
 ---
 
