@@ -10,6 +10,7 @@
 - [this의 용법](#this-용법에-대해서-아는대로-설명해주세요)
 - [event roop란](#event-loop가-무엇이지)
 - [이벤트 버블링](#이벤트-버블링에-대해서-말씀해-주세요)
+- [얕은 복사와 깊은 복사](#얕은-복사shallow-copy와-깊은-복사deep-copy)
 
 # 자바스크립트는 어떤 언어인지?
 
@@ -429,3 +430,74 @@ setTimeout에 특정 지연 시간을 지정하더라도, 큐에서 대기 중�
 <img src="https://joshua1988.github.io/images/posts/web/javascript/event/event-capture.png">
 
 [출처: 이벤트 버블링, 이벤트 캡처 그리고 이벤트 위임까지](https://joshua1988.github.io/web-development/javascript/event-propagation-delegation/)
+
+---
+
+## 얕은 복사(shallow copy)와 깊은 복사(deep copy)
+
+객체를 프로퍼티 값으로 갖는 객체의 경우 얕은 복사는 한 단계까지만 복사하는 것을 말하고, 깊은 복사는 객체에 중첩되어 있는 객체까지 복사하는 것을 말한다.
+
+### 참조에 의한 전달
+
+```js
+// 객체의 경우
+var person = {
+  name: "Lee",
+};
+
+// 참조 값을 복사(얕은 복사)
+var copy = person;
+
+console.log(copy === person); // true
+
+copy.name = "Kim";
+person.addres = "Seoul";
+
+// copy와 person은 동일한 객체를 가리킨다
+// 따라서 어느 한쪽에서 객체를 변경하면 서로 영향을 주고받는다.
+console.log(person); // {name: 'Kim', address: 'Seoul'}
+console.log(copy); // {name: 'Kim', address: 'Seoul'}
+
+var person1 = {
+  name: "Lee",
+};
+
+var person2 = {
+  name: "Lee",
+};
+
+console.log(person1 === person2); // false
+console.log(person1.name === person2.name); // true
+```
+
+이 경우, 객체를 가리키는 변수(원본, person)를 다른 변수(사본, copy)에 할당하면 원본의 참조 값이 복사되어 전달된다. 이를 참조에 의한 전달이라 한다.
+
+```js
+// 배열의 경우
+const arr = ["a", "b", "c"];
+const copy = arr;
+
+arr[2] = "e";
+copy[3] = "f";
+
+console.log(arr); // ['a','b','c','e','f']
+console.log(copy); // ['a','b','c','e','f']
+```
+
+#### 배열을 복사하는 방법
+
+배열을 복사하는 방법으로는 `slice()`, `concat()`, `spread 연산자`, `Array.from()`을 사용할 수 있다.
+
+```js
+const arr1 = ["a", "b", "c"];
+const arr2 = arr1.splice();
+
+console.log(arr1 === arr2); // false
+
+arr2[2] = "d";
+
+console.log(arr1); // ['a','b','c']
+console.log(arr2); // ['a','b','c','d']
+```
+
+출처: 모던 자바스크립트 Deep Dive
