@@ -4,6 +4,7 @@
 - [13장 - 스코프](#13장---스코프)
 - [14장 - 전역 변수의 문제점](#14장---전역-변수의-문제점)
 - [15장 - let, const 키워드와 블록 레벨 스코프](#15장---let-const-키워드와-블록-레벨-스코프)
+- [16장 - 프로퍼티 어트리뷰트](#16장---프로퍼티-어트리뷰트)
 
 # 12장 - 함수
 
@@ -247,3 +248,106 @@ let foo = 1; // 전역 변수
 기본적으로 `const`를 사용하고 `let`은 재할당이 필요한 경우에 한정해 사용한다.
 
 ---
+
+# 16장 - 프로퍼티 어트리뷰트
+
+## 프로퍼티 어트리뷰트와 프로퍼티 디스크립터 객체
+
+자바스크립트 엔진은 **프로퍼티를 생성할 때 프로퍼티의 상태를 나타내는 프로퍼티 어트리뷰트를 기본값으로 자동 정의**한다.
+프로퍼티 상태란 <b>프로퍼티의 값(value), 값의 갱신 가능 여부(writable), 열거 가능 여부(enumerable), 재정의 가능 여부(configurable)</b>를 말한다.
+
+`Object.getOwnPropertyDescriptor`메서드를 호출할 때 첫 번째 매개변수에는 객체의 참조를 전달하고, 두번째 매개변수에는 프로퍼티 키를 문자열로 전달한다. 해당 메서드는 프로퍼티 어트리뷰트 정보를 제공하는 **프로퍼티 디스크립터 객체**를 반환한다.
+
+## 데이터 프로퍼티와 접근자 프로퍼티
+
+### 데이터 프로퍼티 (data property)
+
+키와 값으로 구성된 일반적인 프로퍼티다. 데이터 프로퍼티는 `value`, `writable`, `enumerable`, `configurable`이 있고, 이 프로퍼티 어트리뷰트는 자바스크립트 엔진이 프로퍼티를 생성할 때 기본값으로 자동 정의 된다.
+
+```js
+const person = {
+  name: "Lee",
+};
+
+console.log(Object.getOwnPropertyDescriptor(person, "name"));
+// { value: "Lee", writable: true, enumerable: true, configurable: true }
+```
+
+### 접근자 프로퍼티 (accessor property)
+
+자체적으로는 값을 갖지 않고 다른 데이터 프로퍼티의 값을 읽거나 저장할 때 호출되는 접근자 함수로 구성된 프로퍼티다. 접근자 프로퍼티는 `get`, `set`,`enumerable`,`configurable`이 있다.
+접근자 함수는 getter/setter함수 라고도 부른다.
+
+```js
+const person = {
+  firstName : "Gildong",
+  lastName: "Hong",
+  get fullName(){
+    return `${this.firstName} ${this.lastName}`
+  }
+  set fullname(name){
+    [this.firstName, this.lastName] = name.split(" ");
+  }
+}
+
+person.fullName = "Amugae Lee";
+console.log(person) // {firstName: "Amugae", lastName:"Lee"}
+console.log(person.fullName) // "Amugae Lee"
+
+// 데이터 프로퍼티
+console.log(Object.getOwnPropertyDescriptor(person,"firstName"));
+// {value: "Amugae", wriable: true, enumerable: true, configurable: true}
+
+// 접근자 프로퍼티
+console.log(Object.getOwnPropertyDescriptor(person,"fullName"));
+// {get: f, set: f, enumerable: true, configurable: true}
+```
+
+## 프로퍼티 정의
+
+**프로퍼티 정의**란 새로운 프로퍼티를 추가하면서 프로퍼티 어트리뷰트를 명시적으로 정의하거나, 기존 프로퍼티의 프로퍼티 어트리뷰트를 재정의 하는 것을 말한다. `Object.defineProperty`메서드를 사용하면 프로퍼티의 어트리뷰트를 정의 할 수 있다.
+
+```js
+const person = {};
+
+// 데이터 프로퍼티 정의
+Object.defineProperty(person, "firstName", {
+  value: "Gildong",
+  writable: true,
+  enumerable: true,
+  configurable: true,
+});
+
+// 접근자 프로퍼티 정의
+Object.defineProperty(person, "fullName", {
+  // getter 함수
+  get() {
+    return `${this.firstName} ${this.lastName}`;
+  },
+  set(name) {
+    [this.firstName, this.lastName] = name.split(" ");
+  },
+  enumerable: true,
+  configurable: true,
+});
+```
+
+| 프로퍼티 디스크립터 객체의 프로퍼티 | 대응하는 프로퍼티 어트리뷰트 | 생략했을 떄의 기본값 |
+| ----------------------------------- | ---------------------------- | -------------------- |
+| `value`                             | \[[Value]]                   | undefined            |
+| `get`                               | [\[Get]]                     | undefined            |
+| `set`                               | [\[Set]]                     | undefined            |
+| `writable`                          | [\[Writable]]                | false                |
+| `enumerable`                        | [\[Enumerable]]              | false                |
+| `configurable`                      | [\[Configurable]]            | false                |
+
+## 객체 변경 방지
+
+객체는 변경이 가능한 값이므로 재할당 없이 직접 변경할 수 있다. 즉, 프로퍼티를 추가하거나 삭제할 수 있고, 프로퍼티 값을 갱신할 수 있으며, `Object.defineProperty` 또는 `Object.defineProperties`메서드를 사용하여 프로퍼티 어트리뷰트를 재정의할 수도 있다.
+자바스크립트는 객체의 변경을 방지하는 다양한 메서드를 제공한다.
+
+| 구분           | 메서드                     | 프로퍼티 추가 | 프로퍼티 삭제 | 프로퍼티 값 읽기 | 프로퍼티 값 쓰기 | 프로퍼티 어트리뷰트 재정의 |
+| -------------- | -------------------------- | ------------- | ------------- | ---------------- | ---------------- | -------------------------- |
+| 객체 확장 금지 | `Object.preventExtensions` | X             | O             | O                | O                | O                          |
+| 객체 밀봉      | `Object.seal`              | X             | X             | O                | O                | X                          |
+| 객체 동결      | `Object.freeze`            | X             | X             | O                | X                | X                          |
